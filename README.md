@@ -8,7 +8,7 @@
 `npm i -g yo`
 
 - 然后
-`npm i -g yo generator-webpackpro`
+`npm i -g generator-webpackpro`
 
 接下来我们就可以构建webpack项目了
 
