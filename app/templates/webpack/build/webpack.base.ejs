@@ -1,0 +1,81 @@
+const path = require('path')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const CleanWebpackPlugin = require('clean-webpack-plugin')
+const config = require('./config')
+
+module.exports = {
+    entry: {
+        './public/polyfills': './public/polyfills.js',
+        <%_ if (framework === 'vue') { _%>
+        main: './src/main.js'
+        <%_ } else { _%>
+        index: './src/index.js'
+        <%_ } _%>
+    },
+    output: {
+        filename: '[name]-[hash:7].js',
+        path: path.resolve(__dirname, config.base.dist)
+    },
+    module: {
+        rules: [
+            {
+                test: /\.js$/,
+                exclude: /(node_modules|bower_components)/,
+                use: {
+                    loader: 'babel-loader',
+                    options: { cacheDirectory: true }
+                }
+            },
+            {
+                test: /\.(eot|svg|ttf|woff|woff2)$/,
+                use: [
+                    {
+                        loader: 'url-loader',
+                        options: {
+                            limit: 1024 * 10
+                        }
+                    }
+                ]
+            },
+            {
+                test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
+                loader: 'url-loader',
+                options: {
+                    limit: 10000,
+                    name: './music/[name].[hash:7].[ext]'
+                }
+            },
+            {
+                test: /\.lrc(\?.*)?$/,
+                loader: 'url-loader',
+                options: {
+                    limit: 10000,
+                    name: './music/[name].[hash:7].[ext]'
+                }
+            },
+            {
+                test: /\.(png|jpg|jpeg|gif|svg)$/,
+                use: [ { loader: 'url-loader', options: { limit: 1024 * 10 } } ]
+            }
+        ]
+    },
+    resolve: {
+        mainFiles: ['index'],
+        extensions: ['.js', '.vue'],
+        alias: {
+            src: path.resolve(__dirname, '../src/'),
+            root: path.resolve(__dirname, '../')
+        }
+    },
+    plugins: [
+        new CleanWebpackPlugin([path.resolve(__dirname, config.base.dist)]),
+        new HtmlWebpackPlugin({
+            minify: {
+                collapseWhitespace: true // 折叠空白区域 也就是压缩代码
+            },
+            hash: true,
+            title: 'Custom template',
+            template: 'index.html'
+        })
+    ]
+}

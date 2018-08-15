@@ -1,0 +1,56 @@
+const merge = require('webpack-merge')
+const webpackBaseConfig = require('./webpack.base.js')
+const webpack = require('webpack')
+const config = require('./config')
+<%_ if (framework === 'vue') { _%>
+const VueLoaderPlugin = require('vue-loader/lib/plugin')
+<%_ } _%>
+
+module.exports = merge(webpackBaseConfig, {
+    mode: 'development',
+    devtool: 'inline-source-map',
+    devServer: {
+        contentBase: config.base.dist,
+        host: config.dev.host,
+        port: config.dev.port,
+        hot: config.dev.hot,
+        open: true,
+        overlay: { // 当有编译错误或者警告的时候显示一个全屏overlay
+            errors: true,
+            warnings: false
+        },
+        clientLogLevel: 'warning',
+        noInfo: true,
+        quiet: true,
+        watchOptions: {
+            poll: false
+        }
+    },
+    module: {
+        rules: [
+            <%_ if (framework === 'vue') { _%>
+            {
+                test: /\.vue$/,
+                use: 'vue-loader'
+            },
+            <%_ } _%>
+            {
+                test: /\.s?[ac]ss$/,
+                use: [
+                    'style-loader',
+                    'css-loader'
+                    <%_ if (compiler === 'sass') { _%>
+                    ,'sass-loader'
+                    <%_ } _%>
+                ]
+            }
+        ]
+    },
+    plugins: [
+        new webpack.NamedModulesPlugin(),
+        new webpack.HotModuleReplacementPlugin()
+        <%_ if (framework === 'vue') { _%>
+        ,new VueLoaderPlugin()
+        <%_ } _%>
+    ]
+})
